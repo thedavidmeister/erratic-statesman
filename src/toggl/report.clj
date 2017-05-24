@@ -17,11 +17,11 @@
 
 (defn with-defaults
  [options]
- (let [with-token #(merge {:basic-auth [token "api_token"]} %)
+ (let [with-auth #(merge {:basic-auth [token "api_token"]} %)
        with-agent #(assoc-in % [:query-params :user_agent] user-agent)
        with-workspace #(assoc-in % [:query-params :workspace_id] workspace-id)]
   (-> options
-   with-token
+   with-auth
    with-agent
    with-workspace)))
 
