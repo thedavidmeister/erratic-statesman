@@ -31,7 +31,8 @@
         request (org.httpkit.client/get
                  url
                  (with-defaults options))]
-   (assert (= 200 (:status @request)))
-   (-> @request
-    :body
-    cheshire.core/parse-string))))
+   (if (= 200 (:status @request))
+    (-> @request
+     :body
+     cheshire.core/parse-string)
+    (throw (Exception. (:body @request)))))))
