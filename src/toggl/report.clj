@@ -3,7 +3,8 @@
  (:require
   environ.core
   org.httpkit.client
-  cheshire.core))
+  cheshire.core
+  clojure.walk))
 
 (def base-url "https://toggl.com/reports/api/v2/")
 
@@ -34,5 +35,6 @@
    (if (= 200 (:status @request))
     (-> @request
      :body
-     cheshire.core/parse-string)
+     cheshire.core/parse-string
+     clojure.walk/keywordize-keys)
     (throw (Exception. (:body @request)))))))
