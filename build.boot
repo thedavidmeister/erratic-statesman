@@ -16,6 +16,9 @@
    ; Strings
    [funcool/cuerdas "2.0.3"]
 
+   ; JSON
+   [cheshire "5.7.1"]
+
    ; Environment
    [environ "1.1.0"]
 
