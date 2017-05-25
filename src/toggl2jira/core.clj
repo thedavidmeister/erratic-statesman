@@ -174,6 +174,19 @@
        (str "Toggl times missing from Jira!\n"
         (jira-log-recommendation simplified-times)))))))
 
+  ; Ensure that every time in Jira exists in Toggl.
+  (let [ids->bung-ids #(seq (remove toggl-indexed %))]
+   (when-let [bung-times (seq (filter
+                               #(ids->bung-ids (:toggl-ids %))
+                               jira-times))]
+    (let [next-bung-time (first bung-times)]
+     (throw
+      (Exception.
+       (str
+        "Bad Toggl IDs found in Jira.\n"
+        "Bad IDs: " (ids->bung-ids (:toggl-ids next-bung-time)) "\n"
+        "Jira URL: " (jira-time->url next-bung-time)))))))
+
   ; Ensure that every Toggl ID appears no more than once in the Jira logs.
   (let [toggl-ids (flatten (map :toggl-ids jira-times))
         freqs (frequencies toggl-ids)]
