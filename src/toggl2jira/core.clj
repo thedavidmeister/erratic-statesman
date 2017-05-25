@@ -128,7 +128,27 @@
        (pr-str
         (map
          toggl-time->simplified-toggl-time
-         (jira-time->toggl-candidates next-dangling-time))))))))))
+         (jira-time->toggl-candidates next-dangling-time))))))))
+
+  ; Ensure that every Toggl ID appears no more than once in the Jira logs.
+  (let [toggl-ids (flatten (map :toggl-ids jira-times))
+        freqs (frequencies toggl-ids)]
+   (when-let [dupes (seq (remove (fn [[_ v]] (= 1 v))
+                                 freqs))]
+    (let [next-dupe-id (Integer. (ffirst dupes))
+          dupe-simplified (toggl-time->simplified-toggl-time (get toggl-indexed next-dupe-id))
+          in-time? (fn [id time]
+                    (let [id (str id)
+                          ids (into #{} (:toggl-ids time))]
+                     (boolean (ids id))))
+          jira-dupes (filter #(in-time? next-dupe-id %) jira-times)]
+     (throw
+      (Exception.
+       (str
+        "Toggl time counted multiple times in Jira:\n"
+        (prn-str dupe-simplified)
+        "Appears in:\n"
+        (prn-str (map jira-time->url jira-dupes))))))))))
 
 (defn do-it!
  []
