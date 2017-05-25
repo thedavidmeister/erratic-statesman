@@ -7,15 +7,21 @@ All functionality is currently REPL-only.
 Uses `https://github.com/weavejester/environ` under the hood, so follow the
 instructions there if you're having trouble setting environment variables.
 
-`:jira-host` - host for Jira instance, e.g. `"jira.atlassian.com"`
-`:jira-user` - username for Jira access
-`:jira-password` - password for Jira access
+### Jira config
 
-`:toggl-token` - API token for Toggl
-`:toggl-user-agent` - Your email address
-`:toggl-workspace-id` - Numeric ID, can be found in most Toggl URLs
+- `:jira-host` - host for Jira instance, e.g. `"jira.atlassian.com"`
+- `:jira-user` - username for Jira access
+- `:jira-password` - password for Jira access
 
-`:toggl2jira-client-id` - The client ID in Toggle to reconcile against Jira
+### Toggl config
+
+- `:toggl-token` - API token for Toggl
+- `:toggl-user-agent` - Your email address
+- `:toggl-workspace-id` - Numeric ID, can be found in most Toggl URLs
+
+### Toggl2Jira scanner config
+
+- `:toggl2jira-client-id` - The client ID in Toggle to reconcile against Jira
 
 ## Reconcile Toggl -> Jira
 
