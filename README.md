@@ -64,9 +64,10 @@ The scanner will show a list of Toggl data for entries from the same date as the
 Jira worklog, so hopefully you don't have to search to hard to find the right ID
 values.
 
-e.g. assuming you have a Jira worklog with the description "Doing some work" and
-Toggl times with IDs for this work, 123, 456 and 789. Simply change the Jira
-description to "Doing some work [123 456 789]" and the scanner should be happy.
+e.g. assuming you have a Jira worklog with the description `"Doing some work"`
+and Toggl times with IDs for this work, `123`, `456` and `789`. Simply change
+the Jira description to `"Doing some work [123 456 789]"` and the scanner should
+be happy.
 
 ## Development
 
