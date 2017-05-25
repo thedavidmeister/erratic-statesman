@@ -23,7 +23,10 @@
    [environ "1.1.0"]
 
    ; HTTP
-   [http-kit "2.2.0"]])
+   [http-kit "2.2.0"]
+
+   ; Time
+   [clj-time "0.13.0"]])
 
 (require
  '[samestep.boot-refresh :refer [refresh]])
