@@ -23,7 +23,7 @@ instructions there if you're having trouble setting environment variables.
 
 - `:toggl2jira-client-id` - The client ID in Toggle to reconcile against Jira
 
-## Reconcile Toggl -> Jira
+## Reconciliation scanner - Toggl2Jira
 
 Scans Toggl and Jira then throws exceptions for any time/worklog data that
 appears to be inconsistent or missing.
