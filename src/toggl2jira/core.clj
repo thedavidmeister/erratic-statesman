@@ -111,7 +111,7 @@
  (let [
        toggl-indexed (into {}
                       (map
-                       (fn [t] [(:id t) t])
+                       (fn [t] [(str (:id t)) t])
                        toggl-times))
        with-toggl-ids #(merge {:toggl-ids (extract-ids (:comment %))} %)
        jira-times (->> jira-times (map with-toggl-ids))
@@ -133,13 +133,13 @@
   ; Ensure that every Toggl ID appears no more than once in the Jira logs.
   (let [toggl-ids (flatten (map :toggl-ids jira-times))
         freqs (frequencies toggl-ids)]
+   (prn (count toggl-ids) (count toggl-times) (count toggl-indexed))
    (when-let [dupes (seq (remove (fn [[_ v]] (= 1 v))
                                  freqs))]
-    (let [next-dupe-id (Integer. (ffirst dupes))
+    (let [next-dupe-id (ffirst dupes)
           dupe-simplified (toggl-time->simplified-toggl-time (get toggl-indexed next-dupe-id))
           in-time? (fn [id time]
-                    (let [id (str id)
-                          ids (into #{} (:toggl-ids time))]
+                    (let [ids (into #{} (:toggl-ids time))]
                      (boolean (ids id))))
           jira-dupes (filter #(in-time? next-dupe-id %) jira-times)]
      (throw
@@ -148,7 +148,17 @@
         "Toggl time counted multiple times in Jira:\n"
         (prn-str dupe-simplified)
         "Appears in:\n"
-        (prn-str (map jira-time->url jira-dupes))))))))))
+        (prn-str (map jira-time->url jira-dupes))))))))
+
+  ; Ensure that the Jira time logs equal the sum of their toggl counterparts.
+  (let [jira-time->toggl-total-times (fn [jira-time]
+                                      (let [ids (:toggl-ids jira-time)
+                                            toggls (map
+                                                    #(get toggl-indexed %)
+                                                    ids)]
+                                       (prn ids toggls (keys toggl-indexed) (toggl-indexed "543663016"))
+                                       (reduce + (map :dur toggls))))]
+   (jira-time->toggl-total-times (first jira-times)))))
 
 (defn do-it!
  []
