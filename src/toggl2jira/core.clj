@@ -69,6 +69,13 @@
                   issue-logs)]
   user-logs))
 
+(defn jira-time->url
+ [jira-time]
+ (let [issue-id (:issueId jira-time)
+       issue-key (:key (jira.core/mem-api! (str "issue/" issue-id)))
+       id (:id jira-time)]
+  (str "https://" jira.core/host "/browse/" issue-key "?focusedWorklogId=" id "#worklog-" id)))
+
 (defn reconcile-jira-times
  [toggl-times jira-times]
  (let [
@@ -82,7 +89,7 @@
                       (let [ids (extract-ids (:comment jira-time))]
                        (prn ids)))]
   (when-let [dangling-times (seq (filter (comp nil? :toggl-ids) jira-times))]
-   (throw (Exception. (str "Jira times missing toggl-ids! " dangling-times))))))
+   (throw (Exception. (str "Jira times missing toggl-ids! " (pr-str (pmap jira-time->url dangling-times))))))))
 
 (defn do-it!
  []

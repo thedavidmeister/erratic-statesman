@@ -2,7 +2,8 @@
  (:require
   clojure.walk))
 
-(def base-url (str "https://" (environ.core/env :jira-host ) "/rest/api/latest/"))
+(def host (environ.core/env :jira-host))
+(def base-url (str "https://" host "/rest/api/latest/"))
 (def user (environ.core/env :jira-user))
 (def password (environ.core/env :jira-password))
 
@@ -29,3 +30,5 @@
       parsed
       (throw (Exception. (str "Time to implement pagination! " parsed)))))
     (throw (Exception. (:body @request)))))))
+
+(def mem-api! (memoize api!))
