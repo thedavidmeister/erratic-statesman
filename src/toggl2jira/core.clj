@@ -25,6 +25,14 @@
    ids
    (throw (Exception. (str "Bad project name: " toggl-project-name)))))
 
+(defn toggl-times->jira-issues
+ [times]
+ (into #{}
+  (flatten
+   (map
+    (comp map-project-name :project)
+    times))))
+
 (defn no-empty-projects
  "Throw an error if we are missing a project for a time entry"
  [items]
@@ -59,26 +67,26 @@
        user-logs (filter
                   #(-> % :author :key (= jira.core/user))
                   issue-logs)]
-
-  issue-logs))
+  user-logs))
 
 (defn reconcile-jira-times
  [toggl-times jira-times]
- (let [toggl-indexed (into {}
+ (let [
+       toggl-indexed (into {}
                       (map
                        (fn [t] [(:id t) t])
                        toggl-times))
+       with-toggl-ids #(merge {:toggl-ids (extract-ids (:comment %))} %)
+       jira-times (->> jira-times (map with-toggl-ids))
        reconcilable? (fn [jira-time]
-                      (let [ids (extract-ids (:comment jira-time))]))]
-  (remove reconcilable? jira-times)))
+                      (let [ids (extract-ids (:comment jira-time))]
+                       (prn ids)))]
+  (when-let [dangling-times (seq (filter (comp nil? :toggl-ids) jira-times))]
+   (throw (Exception. (str "Jira times missing toggl-ids! " dangling-times))))))
 
 (defn do-it!
  []
  (let [toggl-times (toggl-items)
-       jira-issues (keys
-                    (into #{}
-                     (map
-                      (comp #(into #{} %) map-project-name :project)
-                      toggl-times)))
+       jira-issues (toggl-times->jira-issues toggl-times)
        jira-times (jira-times-by-issue jira-issues)]
   (reconcile-jira-times toggl-times jira-times)))
