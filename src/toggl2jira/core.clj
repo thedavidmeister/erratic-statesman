@@ -5,19 +5,18 @@
   cuerdas.core
   jira.core
   clj-time.format
-  clj-time.core))
+  clj-time.core
+  clojure.edn))
 
 (def client-id (environ.core/env :toggl2jira-client-id))
 
 (defn extract-ids
+ "Attempt to extract a vector of IDs from a string"
  [s]
- (let [regex-match #(re-find #"\[.+\]" %)
-       drop-brackets #(cuerdas.core/trim % "[]")
-       expand-ids #(map cuerdas.core/trim (clojure.string/split % #"\s"))]
-  (some-> s
-   regex-match
-   drop-brackets
-   expand-ids)))
+ (some->> s
+  (re-find #"\[.+\]")
+  clojure.edn/read-string
+  (map str)))
 
 ; Toggl data processing.
 
