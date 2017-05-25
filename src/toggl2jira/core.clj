@@ -60,12 +60,9 @@
 (defn toggl-items
  []
  (let [api-response (toggl.report/api! "details" {:query-params {:client_ids client-id
-                                                                 :since "2017-01-01"}})
-       ; https://github.com/toggl/toggl_api_docs/issues/262
-       filter-projects #(remove (comp nil? :project) %)]
-  (->> api-response
-   :data
-   no-empty-projects)))
+                                                                 :since "2017-01-01"
+                                                                 :page 4}})]
+  (no-empty-projects api-response)))
 
 (defn jira-times-by-issue
  [projects]

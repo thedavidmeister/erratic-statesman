@@ -25,16 +25,21 @@
    with-agent
    with-workspace)))
 
+(defn with-page [options page] (assoc-in options [:query-params :page] page))
+
 (defn api!
  ([endpoint] (api! endpoint {}))
  ([endpoint options]
   (let [url (str base-url endpoint)
-        request (org.httpkit.client/get
-                 url
-                 (with-defaults options))]
-   (if (= 200 (:status @request))
-    (-> @request
-     :body
-     cheshire.core/parse-string
-     clojure.walk/keywordize-keys)
-    (throw (Exception. (:body @request)))))))
+        options (with-defaults options)]
+   (loop [page 1
+          ret []]
+    (let [request (org.httpkit.client/get
+                   url
+                   (with-page options page))]
+     (when-not (= 200 (:status @request))
+      (throw (Exception. (:body @request))))
+
+     (if-let [data (-> @request :body cheshire.core/parse-string clojure.walk/keywordize-keys :data seq)]
+      (recur (inc page) (into ret data))
+      ret))))))
