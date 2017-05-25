@@ -41,7 +41,7 @@ should include the string `[SALES-123]` or `["SALES-123"]`.
 
 Note that technically the former example maps to the _symbol_ `SALES-123`, not
 the string `"SALES-123"`, but everything parsed is mapped to a string with `str`
-before use anyway.
+before use to avoid edge-cases from types accidentally creeping into data.
 
 0. Fire up a REPL
 0. `toggl2jira.core/do-it!`
