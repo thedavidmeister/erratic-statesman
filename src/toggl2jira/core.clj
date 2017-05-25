@@ -95,12 +95,11 @@
 (defn jira-time->toggl-candidates
  [jira-time]
  (let [date (jira-time->date-str jira-time)
-       candidates (:data
-                   (toggl.report/api!
-                    "details"
-                    {:query-params {:client_ids client-id
-                                    :since date
-                                    :until date}}))]
+       candidates (toggl.report/api!
+                   "details"
+                   {:query-params {:client_ids client-id
+                                   :since date
+                                   :until date}})]
   candidates))
 
 (defn reconcile-jira-times
@@ -121,7 +120,7 @@
    (let [next-dangling-time (first dangling-times)]
     (throw
      (Exception.
-      (str "Jira time " (jira-time->url next-dangling-time) " missing toggl-id! Toggl candidates: "
+      (str "Jira time " (jira-time->url next-dangling-time) " missing toggl-id! Toggl candidates:\n"
        (pr-str
         (map
          toggl-time->simplified-toggl-time
@@ -130,7 +129,6 @@
   ; Ensure that every Toggl ID appears no more than once in the Jira logs.
   (let [toggl-ids (flatten (map :toggl-ids jira-times))
         freqs (frequencies toggl-ids)]
-   (prn (count toggl-ids) (count toggl-times) (count toggl-indexed))
    (when-let [dupes (seq (remove (fn [[_ v]] (= 1 v))
                                  freqs))]
     (let [next-dupe-id (ffirst dupes)
@@ -153,7 +151,7 @@
                                             toggls (map
                                                     #(get toggl-indexed %)
                                                     ids)]
-                                       (prn ids toggls (keys toggl-indexed) (toggl-indexed "543663016"))
+                                       ; (prn ids toggls (keys toggl-indexed) (toggl-indexed "543663016"))
                                        (reduce + (map :dur toggls))))]
    (jira-time->toggl-total-times (first jira-times)))))
 
