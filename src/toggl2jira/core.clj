@@ -35,9 +35,14 @@
     times))))
 
 (defn toggl-duration->jira-duration
- "Toggl reports durations in milliseconds but Jira wants decimal hours."
- [secs]
- (format "%.2f" (float (/ secs (* 60 60 1000)))))
+ "Toggl reports durations in milliseconds but Jira wants mins."
+ [ms]
+ (str (int (/ ms (* 60 1000)))))
+
+(defn jira-seconds->jira-duration
+ "Jira provides a duration in seconds that can be converted to mins."
+ [s]
+ (str (int (/ s (* 60)))))
 
 (defn toggl-times->jira-duration
  [times]
@@ -189,14 +194,26 @@
         (prn-str (map jira-time->url jira-dupes))))))))
 
   ; Ensure that the Jira time logs equal the sum of their toggl counterparts.
-  (let [jira-time->toggl-total-times (fn [jira-time]
-                                      (let [ids (:toggl-ids jira-time)
-                                            toggls (map
-                                                    #(get toggl-indexed %)
-                                                    ids)]
-                                       ; (prn ids toggls (keys toggl-indexed) (toggl-indexed "543663016"))
-                                       (reduce + (map :dur toggls))))]
-   (jira-time->toggl-total-times (first jira-times)))))
+  (let [times (fn [jira-time]
+               (let [jira-time->toggl-times #(select-keys toggl-indexed (:toggl-ids %))
+                     jira-duration (jira-seconds->jira-duration (:timeSpentSeconds jira-time))
+                     toggl-times (vals (jira-time->toggl-times jira-time))
+                     toggl-duration (toggl-times->jira-duration toggl-times)]
+                (vector jira-duration toggl-duration)))
+        times-equal? #(apply = %)
+        bad-times (seq (remove (comp times-equal? times) jira-times))]
+   (when bad-times
+    (let [bt-times (map #(vector % (times %))
+                    bad-times)
+          [t [jira-duration toggl-duration]] (first bt-times)]
+     (throw
+      (Exception.
+       (str
+        "Inconsistent times found.\n"
+        "Time in Toggl: " toggl-duration " mins\n"
+        "Time in Jira: " jira-duration " mins\n"
+        (jira-time->url t) "\n"
+        "Jira time: " (pr-str t)))))))))
 
 (defn do-it!
  []
