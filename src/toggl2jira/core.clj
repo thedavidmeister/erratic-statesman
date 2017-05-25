@@ -35,14 +35,15 @@
     (comp map-project-name :project)
     times))))
 
-(defn format-secs
+(defn toggl-duration->jira-duration
+ "Toggl reports durations in milliseconds but Jira wants decimal hours."
  [secs]
- (clj-time.core/seconds secs))
+ (format "%.2f" (float (/ secs (* 60 60 1000)))))
 
 (defn toggl-time->simplified-toggl-time [time]
  (let [simplified (select-keys time [:description :start :project :id :dur :end])]
   (merge simplified
-   {:dur_formatted (format-secs (:dur simplified))})))
+   {:dur_jira (toggl-duration->jira-duration (:dur simplified))})))
 
 (defn no-empty-projects
  "Throw an error if we are missing a project for a time entry"
@@ -117,6 +118,8 @@
        reconcilable? (fn [jira-time]
                       (let [ids (extract-ids (:comment jira-time))]
                        (prn ids)))]
+  ; Firstly, simply ensure that every work log in Jira has at least one Toggl
+  ; ID associated with it.
   (when-let [dangling-times (seq (filter (comp nil? :toggl-ids) jira-times))]
    (let [next-dangling-time (first dangling-times)]
     (throw
