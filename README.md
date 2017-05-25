@@ -44,6 +44,7 @@ the string `"SALES-123"`, but everything parsed is mapped to a string with `str`
 before use to avoid edge-cases from types accidentally creeping into data.
 
 0. Fire up a REPL
+0. `(require 'toggl2jira.core)`
 0. `toggl2jira.core/do-it!`
 
 Anything else outstanding will trigger an exception that is _hopefully_ self
