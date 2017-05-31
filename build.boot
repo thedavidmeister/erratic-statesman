@@ -29,7 +29,8 @@
    [clj-time "0.13.0"]])
 
 (require
- '[samestep.boot-refresh :refer [refresh]])
+ '[samestep.boot-refresh :refer [refresh]]
+ '[toggl2jira.core])
 
 (deftask repl-server
   []
@@ -41,3 +42,5 @@
 (deftask repl-client
   []
   (repl :client true))
+
+(deftask toggl2jira [] (toggl2jira.core/do-it!))
