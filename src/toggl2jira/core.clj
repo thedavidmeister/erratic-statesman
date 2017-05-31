@@ -166,7 +166,9 @@
                                                     [
                                                      (toggl-time->jira-url (first ts))
                                                      date
-                                                     (toggl-times->jira-duration ts)
+                                                     ; Strangely Jira needs the suffix "m" to recognise minutes when adding a new worklog (Jira assumes hours).
+                                                     ; This isn't required when editing existing worklogs (Jira assumes minutes).
+                                                     (str (toggl-times->jira-duration ts) "m")
                                                      (str desc " " (vec (map :id ts)))]))]
                                     (clojure.string/join "\n" (map log->out logs))))]
      (throw
