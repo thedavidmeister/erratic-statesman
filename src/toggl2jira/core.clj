@@ -105,12 +105,13 @@
   (clj-time.format/parse-local (:date-time clj-time.format/formatters))
   (clj-time.format/unparse-local (:date clj-time.format/formatters))))
 
-(defn toggl-time->date-str
+(defn toggl-time->jira-date-str
+ "Format a toggle time into a date string usable in the Jira UI"
  [toggl-time]
  (->> toggl-time
   :start
   (clj-time.format/parse-local (:date-time-no-ms clj-time.format/formatters))
-  (clj-time.format/unparse-local (:date clj-time.format/formatters))))
+  (clj-time.format/unparse-local (clj-time.format/formatter "dd/MMM/yy"))))
 
 (defn jira-time->toggl-candidates
  [jira-time]
@@ -153,7 +154,7 @@
     (let [simplified-times (map (comp toggl-time->simplified-toggl-time #(get toggl-indexed %))
                                 toggl-ids-not-in-jira)
           with-date (fn [time]
-                     (merge {:date (toggl-time->date-str time)}
+                     (merge {:date (toggl-time->jira-date-str time)}
                             time))
           jira-log-recommendation (fn [times]
                                    (let [with-dates (map with-date times)
