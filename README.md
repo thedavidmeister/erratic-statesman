@@ -1,6 +1,8 @@
 # erratic statesman
 
-All functionality is currently REPL-only.
+All low level functionality is REPL-only.
+
+`toggl2jira` has a boot task: `boot toggl2jira`.
 
 ## Environment
 
@@ -49,9 +51,7 @@ Note that technically the former example maps to the _symbol_ `SALES-123`, not
 the string `"SALES-123"`, but everything parsed is mapped to a string with `str`
 before use to avoid edge-cases from types accidentally creeping into data.
 
-0. Fire up a REPL `boot repl`
-0. `(require 'toggl2jira.core)`
-0. `toggl2jira.core/do-it!`
+Run the boot task `boot toggl2jira`.
 
 Anything else outstanding will trigger an exception that is _hopefully_ self
 explanatory.
