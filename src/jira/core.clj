@@ -29,6 +29,6 @@
      (if (= (:total parsed) (:maxResults parsed))
       parsed
       (throw (Exception. (str "Time to implement pagination! " parsed)))))
-    (throw (Exception. (:body @request)))))))
+    (throw (Exception. (str url " " (:body @request))))))))
 
 (def mem-api! (memoize api!))
