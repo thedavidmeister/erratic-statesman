@@ -171,7 +171,7 @@
                                                      ; This isn't required when editing existing worklogs (Jira assumes minutes).
                                                      (str (toggl-times->jira-duration ts) "m")
                                                      (str desc " " (vec (map :id ts)))]))]
-                                    (clojure.string/join "\n" (map log->out logs))))]
+                                    (clojure.string/join "\n" (map log->out (sort logs)))))]
      (throw
       (Exception.
        (str "Toggl times missing from Jira!\n"
