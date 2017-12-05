@@ -44,6 +44,10 @@
  [s]
  (str (int (/ s (* 60)))))
 
+(defn toggl-duration->hours-duration
+ [ms]
+ (str (int (/ ms (* 60 60 1000)))))
+
 (defn toggl-times->jira-duration
  [times]
  (toggl-duration->jira-duration (reduce + (map :dur times))))
@@ -170,6 +174,7 @@
                                                      ; Strangely Jira needs the suffix "m" to recognise minutes when adding a new worklog (Jira assumes hours).
                                                      ; This isn't required when editing existing worklogs (Jira assumes minutes).
                                                      (str (toggl-times->jira-duration ts) "m")
+                                                     (str (toggl-times->hours-duration ts) "h")
                                                      (str desc " " (vec (map :id ts)))]))]
                                     (clojure.string/join "\n" (map log->out (sort logs)))))]
      (throw
