@@ -22,6 +22,7 @@
 (defn with-page [options page] (assoc-in options [:query-params :page] page))
 
 (defn api!
+ "As per toggl.api/api! but handles pagination and body of report response"
  ([endpoint] (api! endpoint {}))
  ([endpoint options]
   (let [url (str base-url endpoint)
@@ -31,9 +32,7 @@
     (let [request (org.httpkit.client/get
                    url
                    (with-page options page))]
-     (when-not (= 200 (:status @request))
-      (throw (Exception. (:body @request))))
-
-     (if-let [data (-> @request :body cheshire.core/parse-string clojure.walk/keywordize-keys :data seq)]
+     (toggl.api/throw-bad-response! @request)
+     (if-let [data (-> @request toggl.api/parse-body :data seq)]
       (recur (inc page) (into ret data))
       ret))))))

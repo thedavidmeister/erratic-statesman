@@ -25,6 +25,15 @@
 
 (defn with-page [options page] (assoc-in options [:query-params :page] page))
 
+(defn throw-bad-response!
+ [response]
+ (when-not (= 200 (:status response))
+  (throw (Exception. (:body response)))))
+
+(defn parse-body
+ [response]
+ (-> response :body cheshire.core/parse-string clojure.walk/keywordize-keys))
+
 (defn api!
  ([endpoint] (api! endpoint {}))
  ([endpoint options]
@@ -33,9 +42,8 @@
         request (org.httpkit.client/get
                  url
                  options)]
-   (when-not (= 200 (:status @request))
-    (throw (Exception. (:body @request))))
 
-   (-> @request :body cheshire.core/parse-string clojure.walk/keywordize-keys))))
+   (throw-bad-response! @request)
+   (parse-body @request))))
 
 (def workspaces (partial api! "workspaces"))
