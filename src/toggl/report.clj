@@ -5,7 +5,8 @@
   org.httpkit.client
   cheshire.core
   clojure.walk
-  toggl.data))
+  toggl.data
+  toggl.api))
 
 (def base-url "https://toggl.com/reports/api/v2/")
 
@@ -13,11 +14,10 @@
 
 (defn with-defaults
  [options]
- (let [with-auth #(merge {:basic-auth [toggl.data/token "api_token"]} %)
-       with-agent #(assoc-in % [:query-params :user_agent] toggl.data/user-agent)
+ (let [with-agent #(assoc-in % [:query-params :user_agent] toggl.data/user-agent)
        with-workspace #(assoc-in % [:query-params :workspace_id] workspace-id)]
   (-> options
-   with-auth
+   toggl.api/with-auth
    with-agent
    with-workspace)))
 
