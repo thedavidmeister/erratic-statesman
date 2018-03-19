@@ -10,11 +10,11 @@
 
 (def base-url "https://toggl.com/reports/api/v2/")
 
-(def workspace-id (environ.core/env :toggl-workspace-id))
+(def workspace-id (memoize (fn [] (first (map :id (toggl.api/workspaces!))))))
 
 (defn with-defaults
  [options]
- (let [with-workspace #(assoc-in % [:query-params :workspace_id] workspace-id)]
+ (let [with-workspace #(assoc-in % [:query-params :workspace_id] (workspace-id))]
   (-> options
    toggl.api/with-defaults
    with-workspace)))

@@ -19,7 +19,6 @@ instructions there if you're having trouble setting environment variables.
 
 - `:toggl-token` - API token for Toggl
 - `:toggl-user-agent` - Your email address
-- `:toggl-workspace-id` - Numeric ID, can be found in most Toggl URLs
 
 ### Toggl2Jira scanner config
 
