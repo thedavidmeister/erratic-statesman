@@ -70,11 +70,15 @@
 
 ; Jira data processing.
 
+(defn since
+ []
+ ; https://github.com/toggl/toggl_api_docs/issues/302
+ (str (clj-time.core/minus (clj-time.core/now) (clj-time.core/months 11))))
+
 (defn toggl-items
  []
- (let [api-response (toggl.report/api! "details" {:query-params {:client_ids client-id
-                                                                 :since "2017-01-01"
-                                                                 :page 4}})]
+ (let [api-response (toggl.report/api! "details" {:query-params {:client_ids [client-id]
+                                                                 :since (since)}})]
   (no-empty-projects api-response)))
 
 (defn jira-times-by-issue
