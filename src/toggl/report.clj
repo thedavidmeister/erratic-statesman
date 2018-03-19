@@ -14,11 +14,9 @@
 
 (defn with-defaults
  [options]
- (let [with-agent #(assoc-in % [:query-params :user_agent] toggl.data/user-agent)
-       with-workspace #(assoc-in % [:query-params :workspace_id] workspace-id)]
+ (let [with-workspace #(assoc-in % [:query-params :workspace_id] workspace-id)]
   (-> options
-   toggl.api/with-auth
-   with-agent
+   toggl.api/with-defaults
    with-workspace)))
 
 (defn with-page [options page] (assoc-in options [:query-params :page] page))
@@ -33,7 +31,6 @@
     (let [request (org.httpkit.client/get
                    url
                    (with-page options page))]
-     (prn @request)
      (when-not (= 200 (:status @request))
       (throw (Exception. (:body @request))))
 
