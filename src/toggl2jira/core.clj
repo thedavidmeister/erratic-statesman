@@ -72,9 +72,10 @@
 
 (defn toggl-items
  []
- (let [api-response (toggl.report/api! "details" {:query-params {:client_ids client-id
+ (prn client-id)
+ (let [api-response (toggl.report/api! "details" {:query-params {:client_ids [client-id]
                                                                  :since "2017-01-01"
-                                                                 :page 4}})]
+                                                                 :page 1}})]
   (no-empty-projects api-response)))
 
 (defn jira-times-by-issue

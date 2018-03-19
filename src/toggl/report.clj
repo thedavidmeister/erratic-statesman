@@ -4,21 +4,17 @@
   environ.core
   org.httpkit.client
   cheshire.core
-  clojure.walk))
+  clojure.walk
+  toggl.data))
 
 (def base-url "https://toggl.com/reports/api/v2/")
-
-(def token (environ.core/env :toggl-token))
-; The name of your application or your email address so we can get in touch in
-; case you're doing something wrong.
-(def user-agent (environ.core/env :toggl-user-agent))
 
 (def workspace-id (environ.core/env :toggl-workspace-id))
 
 (defn with-defaults
  [options]
- (let [with-auth #(merge {:basic-auth [token "api_token"]} %)
-       with-agent #(assoc-in % [:query-params :user_agent] user-agent)
+ (let [with-auth #(merge {:basic-auth [toggl.data/token "api_token"]} %)
+       with-agent #(assoc-in % [:query-params :user_agent] toggl.data/user-agent)
        with-workspace #(assoc-in % [:query-params :workspace_id] workspace-id)]
   (-> options
    with-auth
@@ -37,6 +33,7 @@
     (let [request (org.httpkit.client/get
                    url
                    (with-page options page))]
+     (prn @request)
      (when-not (= 200 (:status @request))
       (throw (Exception. (:body @request))))
 
