@@ -46,4 +46,4 @@
    (throw-bad-response! @request)
    (parse-body @request))))
 
-(def workspaces (partial api! "workspaces"))
+(def workspaces! (partial api! "workspaces"))
