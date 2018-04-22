@@ -6,7 +6,8 @@
   cheshire.core
   clojure.walk
   toggl.data
-  toggl.api))
+  toggl.api
+  time.core))
 
 (def base-url "https://toggl.com/reports/api/v2/")
 
@@ -20,19 +21,40 @@
    with-workspace)))
 
 (defn with-page [options page] (assoc-in options [:query-params :page] page))
+(defn with-month-until
+ [options]
+ (assoc-in options [:query-params :until]
+  (time.core/->iso8601
+   (clj-time.core/plus
+    (time.core/iso8601-> (-> options :query-params :since))
+    (clj-time.core/months 1)))))
 
 (defn api!
  "As per toggl.api/api! but handles pagination and body of report response"
  ([endpoint] (api! endpoint {}))
  ([endpoint options]
+  (assert
+   (not (:until options))
+   "Until not implemented as a parameter")
+
   (let [url (str base-url endpoint)
-        options (with-defaults options)]
-   (loop [page 1
-          ret []]
-    (let [request (org.httpkit.client/get
-                   url
-                   (with-page options page))]
-     (toggl.api/throw-bad-response! @request)
-     (if-let [data (-> @request toggl.api/parse-body :data seq)]
-      (recur (inc page) (into ret data))
-      ret))))))
+        options (with-defaults options)
+        since (-> options :query-params :since)
+        sinces (time.core/date-repeat since (clj-time.core/now) (clj-time.core/months 1))]
+   (doall
+    (flatten
+     (map
+      (fn [s]
+       (loop [page 1
+              ret []]
+        (let [request (org.httpkit.client/get
+                       url
+                       (-> options
+                        (with-page page)
+                        (assoc-in [:query-params :since] (time.core/->iso8601 s))
+                        with-month-until))]
+         (toggl.api/throw-bad-response! @request)
+         (if-let [data (-> @request toggl.api/parse-body :data seq)]
+          (recur (inc page) (into ret data))
+          ret))))
+      sinces))))))

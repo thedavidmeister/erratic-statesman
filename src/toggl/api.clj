@@ -42,7 +42,6 @@
         request (org.httpkit.client/get
                  url
                  options)]
-
    (throw-bad-response! @request)
    (parse-body @request))))
 
