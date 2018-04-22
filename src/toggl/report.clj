@@ -29,9 +29,9 @@
     (time.core/iso8601-> (-> options :query-params :since))
     (clj-time.core/months 1)))))
 
-(defn api!
+(defn -api!
  "As per toggl.api/api! but handles pagination and body of report response"
- ([endpoint] (api! endpoint {}))
+ ([endpoint] (-api! endpoint {}))
  ([endpoint options]
   (assert
    (not (:until options))
@@ -58,3 +58,4 @@
           (recur (inc page) (into ret data))
           ret))))
       sinces))))))
+(def api! (memoize -api!))
