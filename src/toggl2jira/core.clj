@@ -6,7 +6,8 @@
   jira.core
   clj-time.format
   clj-time.core
-  clojure.edn))
+  clojure.edn
+  time.core))
 
 (def client-id (environ.core/env :toggl2jira-client-id))
 
@@ -72,8 +73,7 @@
 
 (defn since
  []
- ; https://github.com/toggl/toggl_api_docs/issues/302
- (str (clj-time.core/minus (clj-time.core/now) (clj-time.core/months 11))))
+ (str (clj-time.core/date-time 2016 1 1)))
 
 (defn toggl-items
  []
