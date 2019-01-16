@@ -37,9 +37,11 @@
 
 (defn iso8601->
  [s]
- (clj-time.format/parse
-  (clj-time.format/formatters :date-time)
-  s))
+ (try
+  (format-> :date-time s)
+  ; date only is a valid iso8601
+  (catch Exception e
+   (format-> :date s))))
 
 (defn yyyy-mm->date
  [yyyy-mm]
